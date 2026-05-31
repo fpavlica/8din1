@@ -30,6 +30,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return { minRolls: results, probabilities: probNHits };
     }
 
+    function getColorForProbability(prob, maxProb) {
+        const ratio = maxProb > 0 ? prob / maxProb : 0;
+        const hue = 30 + ratio * 90;
+        return `hsl(${hue}, 80%, 45%)`;
+    }
+
     function buildResultRows(minRolls, probabilities, diceSize, numMobs) {
         const rows = [];
 
@@ -50,6 +56,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        const maxProb = Math.max(...rows.map(r => r.probability));
+        rows.forEach(row => {
+            row.color = getColorForProbability(row.probability, maxProb);
+        });
+
         return rows;
     }
 
@@ -66,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const rows = buildResultRows(minRolls, probabilities, diceSize, numMobs);
 
         resultsBody.innerHTML = rows.map(row =>
-            `<tr><td>${row.range}</td><td>${row.hits}</td><td class="probability">${(row.probability * 100).toFixed(1)}%</td></tr>`
+            `<tr><td>${row.range}</td><td>${row.hits}</td><td class="probability" style="color: ${row.color}">${(row.probability * 100).toFixed(1)}%</td></tr>`
         ).join('');
     }
 
