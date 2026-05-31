@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return rows;
     }
 
-    function updateResults() {
+    function getInputValues() {
         const rawNumMobs = parseInt(numCreaturesInput.value);
         const rawToHit = parseInt(toHitInput.value);
         const rawDiceSize = parseInt(diceSizeInput.value);
@@ -102,27 +102,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const hasEmptyInput = numCreaturesInput.value === '' || toHitInput.value === '' || diceSizeInput.value === '';
         const hasValidValues = !isNaN(rawNumMobs) && !isNaN(rawToHit) && !isNaN(rawDiceSize);
 
-        if (hasEmptyInput && isEditing) return;
+        return { rawNumMobs, rawToHit, rawDiceSize, hasEmptyInput, hasValidValues };
+    }
 
-        const numMobs = Math.max(1, rawNumMobs || 1);
-        const toHit = Math.max(1, rawToHit || 1);
-        const diceSize = Math.max(2, rawDiceSize || 2);
+    function sanitizeValues(rawNumMobs, rawToHit, rawDiceSize) {
+        return {
+            numMobs: Math.max(1, rawNumMobs || 1),
+            toHit: Math.max(1, rawToHit || 1),
+            diceSize: Math.max(2, rawDiceSize || 2)
+        };
+    }
 
+    function updateInputValues(numMobs, toHit, diceSize) {
         if (!isEditing) {
             numCreaturesInput.value = numMobs;
             toHitInput.value = toHit;
             diceSizeInput.value = diceSize;
-        } else if (hasValidValues) {
-            numCreaturesInput.dataset.temp = numMobs;
-            toHitInput.dataset.temp = toHit;
-            diceSizeInput.dataset.temp = diceSize;
         }
+    }
 
-        if (!hasValidValues && isEditing) return;
-
-        const { minRolls, probabilities } = calcMobHits(numMobs, toHit, diceSize);
-        const rows = buildResultRows(minRolls, probabilities, diceSize, numMobs);
-
+    function renderTable(rows, numMobs, diceSize) {
         const multiDiceLabel = `${numMobs}d${diceSize}`;
         const singleDiceLabel = `1d${diceSize}`;
         document.querySelector('#resultsTable thead tr').innerHTML =
@@ -131,6 +130,20 @@ document.addEventListener('DOMContentLoaded', () => {
         resultsBody.innerHTML = rows.map(row =>
             `<tr><td>${row.range}</td><td>${row.hits}</td><td class="probability" style="color: ${row.color}">${(row.expectedProb * 100).toFixed(1)}%</td><td class="probability" style="color: ${row.color}">${(row.d1Prob * 100).toFixed(1)}%</td></tr>`
         ).join('');
+    }
+
+    function updateResults() {
+        const { rawNumMobs, rawToHit, rawDiceSize, hasEmptyInput, hasValidValues } = getInputValues();
+
+        if (hasEmptyInput && isEditing) return;
+        if (!hasValidValues && isEditing) return;
+
+        const { numMobs, toHit, diceSize } = sanitizeValues(rawNumMobs, rawToHit, rawDiceSize);
+        updateInputValues(numMobs, toHit, diceSize);
+
+        const { minRolls, probabilities } = calcMobHits(numMobs, toHit, diceSize);
+        const rows = buildResultRows(minRolls, probabilities, diceSize, numMobs);
+        renderTable(rows, numMobs, diceSize);
     }
 
     numCreaturesInput.addEventListener('input', updateResults);
