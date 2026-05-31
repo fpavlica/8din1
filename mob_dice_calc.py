@@ -29,18 +29,31 @@ def calc(number_of_mobs: int, to_hit_roll: int, to_hit_out_of: int = 20, print=p
     # d20_dist = [(22 *(1-p)) for p in prob_at_least_n_hits]
     # print(d20_dist)
     # d20_dist = [math.floor(d) for d in d20_dist]
-    stretched = [(p-1/21)*(21/20) for p in prob_n_hits]
+    # stretched = [(p-1/21)*(21/20) for p in prob_n_hits]
 
-    chunk_sizes = [(21)*p for p in prob_n_hits]
+    # chunk_sizes = [(21)*p for p in prob_n_hits]
     # print(chunk_sizes)
     accum = 0
-    d20_dist = [-1.0] * (number_of_mobs)
+    d1_dist = [-1.0] * (number_of_mobs)
+    
     for i in range(number_of_mobs):
         # print(chunk_sizes[i] + accum)
-        accum += chunk_sizes[i]
-        d20_dist[i]=math.floor(1+accum)
+        accum += prob_n_hits[i]
+        d1_dist[i]=accum
+        # d20_dist[i]=math.floor(1+accum)
         # print(f"Would have to roll at least floor of {(1+accum)} to hit {i+1} times")
     # print(chunk_sizes)
+    print(d1_dist)
+
+    d20_dist = [math.floor(21*p+1) for p in d1_dist]
+    # 1+x\left(m+h\right)-\left(s_{2}\left(m+h\right)\right)
+    def to_dice_result(dice_size, p):
+        return round(p*dice_size+1)
+        # slope_modifier = dice_size+ (dice_size/(dice_size-1))
+        # shift_modifier = 1/(2*dice_size)
+        # return math.floor(p* slope_modifier - shift_modifier*slope_modifier +1)
+    d20_dist = [to_dice_result(to_hit_out_of,p) for p in d1_dist]
+    # d20_dist = [round(21*p) for p in d1_dist]
 
     return d20_dist
 

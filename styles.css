@@ -83,7 +83,10 @@ td:last-child {
 }
 
 td.probability {
-    color: #999;
     font-size: 0.85rem;
     font-family: sans-serif;
+}
+
+td.probability.d1-prob {
+    color: #999;
 }

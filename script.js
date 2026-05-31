@@ -37,13 +37,13 @@ document.addEventListener('DOMContentLoaded', () => {
             probNHits.push(comb(numMobs, i) * Math.pow(hitProb, i) * Math.pow(1 - hitProb, numMobs - i));
         }
 
-        const chunkSizes = probNHits.map(p => (diceSize + 1) * p);
-        let accum = 0;
-        const results = Array(numMobs).fill("Error");
+        let accum = 0.0;
+        const d1probabilities = Array(numMobs).fill("Error");
         for (let i = 0; i < numMobs; i++) {
-            accum += chunkSizes[i];
-            results[i] = (Math.floor(1 + accum));
+            accum += probNHits[i];
+            d1probabilities[i] = accum;
         }
+        results = d1probabilities.map(p => Math.round(p * diceSize + 1))
         return { minRolls: results, probabilities: probNHits };
     }
 
