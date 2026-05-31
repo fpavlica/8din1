@@ -43,13 +43,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         resultsBody.innerHTML = '';
 
-        const row0Prob = (probabilities[0] * 100).toFixed(1);
-        resultsBody.innerHTML += `<tr><td>0</td><td>-</td><td class="probability">${row0Prob}%</td></tr>`;
+        const zeroMaxRoll = minRolls[0] > diceSize ? diceSize : minRolls[0] - 1;
+        if (1 <= zeroMaxRoll) {
+            const rangeText = 1 === zeroMaxRoll ? '1' : `1-${zeroMaxRoll}`;
+            resultsBody.innerHTML += `<tr><td>${rangeText}</td><td>0</td><td class="probability">${(probabilities[0] * 100).toFixed(1)}%</td></tr>`;
+        }
 
         minRolls.forEach((roll, i) => {
-            const prob = (probabilities[i + 1] * 100).toFixed(1);
-            const displayRoll = roll > diceSize ? '-' : roll;
-            resultsBody.innerHTML += `<tr><td>${i + 1}</td><td>${displayRoll}</td><td class="probability">${prob}%</td></tr>`;
+            let accumProb = 0;
+            for (let j = i + 1; j <= numMobs; j++) {
+                accumProb += probabilities[j];
+            }
+            const prob = (accumProb * 100).toFixed(1);
+            const minRoll = roll > diceSize ? diceSize + 1 : roll;
+            const nextMinRoll = i === minRolls.length - 1 ? diceSize + 1 : (minRolls[i + 1] > diceSize ? diceSize + 1 : minRolls[i + 1]);
+            const maxRoll = nextMinRoll - 1;
+
+            if (minRoll <= diceSize && minRoll <= maxRoll) {
+                const rangeText = minRoll === maxRoll ? `${minRoll}` : `${minRoll}-${maxRoll}`;
+                resultsBody.innerHTML += `<tr><td>${rangeText}</td><td>${i + 1}</td><td class="probability">${prob}%</td></tr>`;
+            }
         });
     }
 
