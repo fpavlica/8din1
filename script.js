@@ -2,7 +2,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const numCreaturesInput = document.getElementById('numCreatures');
     const toHitInput = document.getElementById('toHit');
     const diceSizeInput = document.getElementById('diceSize');
+    const diceSizePreset = document.getElementById('diceSizePreset');
     const resultsBody = document.querySelector('#resultsTable tbody');
+
+    const presetValues = ['20', '12', '10', '8', '6', '4'];
+
+    diceSizePreset.addEventListener('change', () => {
+        diceSizeInput.value = diceSizePreset.value.replace('d', '');
+        toHitInput.max = diceSizeInput.value;
+        updateResults();
+    });
+
+    diceSizeInput.addEventListener('input', () => {
+        const value = diceSizeInput.value;
+        const presetIndex = presetValues.indexOf(value);
+        diceSizePreset.selectedIndex = presetIndex !== -1 ? presetIndex : -1;
+        toHitInput.max = value;
+        updateResults();
+    });
 
     function comb(n, k) {
         if (k < 0 || k > n) return 0;
@@ -83,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     numCreaturesInput.addEventListener('input', updateResults);
     toHitInput.addEventListener('input', updateResults);
-    diceSizeInput.addEventListener('input', updateResults);
 
     updateResults();
 });
