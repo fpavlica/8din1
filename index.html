@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mob Hit Dice Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Mob Hit Dice Calculator</h1>
+
+        <div class="input-group">
+            <label for="numCreatures">Number of creatures in mob</label>
+            <input type="number" id="numCreatures" value="8" min="1" max="20">
+        </div>
+
+        <div class="input-group">
+            <label for="toHit">Creature roll needed to hit</label>
+            <input type="number" id="toHit" value="11" min="1" max="20">
+        </div>
+
+        <div class="input-group">
+            <label for="diceSize">Dice size</label>
+            <input type="number" id="diceSize" value="20" min="2">
+        </div>
+
+        <div class="results">
+            <h2>Results</h2>
+            <table id="resultsTable">
+                <thead>
+                    <tr>
+                        <th>Hits</th>
+                        <th>Min Roll</th>
+                        <th>Probability</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
