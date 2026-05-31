@@ -7,6 +7,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const presetValues = ['20', '12', '10', '8', '6', '4'];
 
+    const inputs = [numCreaturesInput, toHitInput, diceSizeInput];
+    let isEditing = false;
+
+    inputs.forEach(input => {
+        input.addEventListener('focus', () => isEditing = true);
+        input.addEventListener('blur', () => {
+            isEditing = false;
+            updateResults();
+        });
+    });
+
     diceSizePreset.addEventListener('change', () => {
         diceSizeInput.value = diceSizePreset.value.replace('d', '');
         toHitInput.max = diceSizeInput.value;
@@ -84,13 +95,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateResults() {
-        const numMobs = Math.max(1, parseInt(numCreaturesInput.value) || 1);
-        const toHit = Math.max(1, parseInt(toHitInput.value) || 1);
-        const diceSize = Math.max(2, parseInt(diceSizeInput.value) || 2);
+        const rawNumMobs = parseInt(numCreaturesInput.value);
+        const rawToHit = parseInt(toHitInput.value);
+        const rawDiceSize = parseInt(diceSizeInput.value);
 
-        numCreaturesInput.value = numMobs;
-        toHitInput.value = toHit;
-        diceSizeInput.value = diceSize;
+        const hasEmptyInput = numCreaturesInput.value === '' || toHitInput.value === '' || diceSizeInput.value === '';
+        const hasValidValues = !isNaN(rawNumMobs) && !isNaN(rawToHit) && !isNaN(rawDiceSize);
+
+        if (hasEmptyInput && isEditing) return;
+
+        const numMobs = Math.max(1, rawNumMobs || 1);
+        const toHit = Math.max(1, rawToHit || 1);
+        const diceSize = Math.max(2, rawDiceSize || 2);
+
+        if (!isEditing) {
+            numCreaturesInput.value = numMobs;
+            toHitInput.value = toHit;
+            diceSizeInput.value = diceSize;
+        } else if (hasValidValues) {
+            numCreaturesInput.dataset.temp = numMobs;
+            toHitInput.dataset.temp = toHit;
+            diceSizeInput.dataset.temp = diceSize;
+        }
+
+        if (!hasValidValues && isEditing) return;
 
         const { minRolls, probabilities } = calcMobHits(numMobs, toHit, diceSize);
         const rows = buildResultRows(minRolls, probabilities, diceSize, numMobs);
