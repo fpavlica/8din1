@@ -4,13 +4,16 @@ A web tool for calculating mob attack probabilities in tabletop RPGs. Instead of
 
 ## How It Works
 
-Enter the number of creatures in the mob, the roll needed to hit, and the dice size. The calculator uses binomial probability to determine ranges of die results that correspond to different numbers of hits.
+Enter the number of creatures in the mob, the roll needed to hit, and optionally the type of dice. The calculator uses binomial probability to determine ranges of die results that correspond to different numbers of hits.
 
-For example, with 8 creatures needing a 15+ to hit on a d20:
-- Roll 1-10: 0 hits (most likely)
-- Roll 11-14: 1 hit
-- Roll 15-17: 2 hits
-- Roll 18-20: 3+ hits
+For example, with 8 creatures needing a 15+ roll on a d20 to hit:
+- Roll 1: 0 hits
+- Roll 2-5: 1 hit
+- Roll 6-11: 2 hits
+- Roll 12-16: 3 hits
+- Roll 17-19: 4 hits
+- Roll 20: 5 hits
+- 6+ hits are considered too improbable (<)
 
 ## Usage
 

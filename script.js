@@ -59,7 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const zeroMaxRoll = minRolls[0] > diceSize ? diceSize : minRolls[0] - 1;
         if (1 <= zeroMaxRoll) {
             const rangeText = 1 === zeroMaxRoll ? '1' : `1-${zeroMaxRoll}`;
-            rows.push({ range: rangeText, hits: 0, probability: probabilities[0] });
+            const rangeWidth = zeroMaxRoll - 1 + 1;
+            rows.push({ range: rangeText, hits: 0, expectedProb: probabilities[0], d1Prob: rangeWidth / diceSize });
         }
 
         minRolls.forEach((roll, i) => {
@@ -69,13 +70,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (minRoll <= diceSize && minRoll <= maxRoll) {
                 const rangeText = minRoll === maxRoll ? `${minRoll}` : `${minRoll}-${maxRoll}`;
-                rows.push({ range: rangeText, hits: i + 1, probability: probabilities[i + 1] });
+                const rangeWidth = maxRoll - minRoll + 1;
+                rows.push({ range: rangeText, hits: i + 1, expectedProb: probabilities[i + 1], d1Prob: rangeWidth / diceSize });
             }
         });
 
-        const maxProb = Math.max(...rows.map(r => r.probability));
+        const maxProb = Math.max(...rows.map(r => r.d1Prob));
         rows.forEach(row => {
-            row.color = getColorForProbability(row.probability, maxProb);
+            row.color = getColorForProbability(row.d1Prob, maxProb);
         });
 
         return rows;
@@ -93,8 +95,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const { minRolls, probabilities } = calcMobHits(numMobs, toHit, diceSize);
         const rows = buildResultRows(minRolls, probabilities, diceSize, numMobs);
 
+        const multiDiceLabel = `${numMobs}d${diceSize}`;
+        const singleDiceLabel = `1d${diceSize}`;
+        document.querySelector('#resultsTable thead tr').innerHTML =
+            `<th>Roll Range</th><th>Hits</th><th>${multiDiceLabel}</th><th>${singleDiceLabel}</th>`;
+
         resultsBody.innerHTML = rows.map(row =>
-            `<tr><td>${row.range}</td><td>${row.hits}</td><td class="probability" style="color: ${row.color}">${(row.probability * 100).toFixed(1)}%</td></tr>`
+            `<tr><td>${row.range}</td><td>${row.hits}</td><td class="probability" style="color: ${row.color}">${(row.expectedProb * 100).toFixed(1)}%</td><td class="probability" style="color: ${row.color}">${(row.d1Prob * 100).toFixed(1)}%</td></tr>`
         ).join('');
     }
 
